@@ -7,17 +7,19 @@ using UnityEngine;
 
 public sealed class MyScript : MonoBehaviour
 {
-  private const int NumberOfObstacles = 50;
+  private const int NumberOfObstacles = 100;
 
-  private const ulong PeriodForObstacleSpawning = 10;
+  private const ulong PeriodForObstacleSpawning = 1;
 
-  private readonly HashSet<GameObject> _obstacles;
+  private readonly List<GameObject> _obstacles;
 
   private readonly Dictionary<int, Rigidbody2D> _rigidBodies;
 
+  private int _currentObstacleIndex;
+
   private ulong _currentPeriod;
 
-  private HashSet<GameObject>.Enumerator? _obstaclesEnumerator;
+  private readonly Vector2 _noVelocity = new(0, 0);
 
   public MyScript()
   {
@@ -51,20 +53,19 @@ public sealed class MyScript : MonoBehaviour
 
     foreach (var obstacle in this._obstacles)
     {
-      this._rigidBodies[obstacle.GetInstanceID()] = obstacle.GetComponent<Rigidbody2D>()!;
-      this.SetPos(obstacle, 100, 100);
       var rb = obstacle.GetComponent<Rigidbody2D>()!;
 
-      rb.AddForce(new(-10, 0), ForceMode2D.Impulse);
+      this._rigidBodies[obstacle.GetInstanceID()] = rb;
+      this.SetPos(obstacle, 100, 100);
     }
-
-    this._obstaclesEnumerator = this._obstacles.GetEnumerator();
   }
 
   private void NextMove()
   {
     var obstacle = this.NextObstacle();
     this.SetPos(obstacle, MyScript.NextCoordinates());
+    var rb = this.GetRigidBody(obstacle);
+    rb.AddForce(new(-100, 0), ForceMode2D.Impulse);
   }
 
   private static Vector3 NextCoordinates()
@@ -90,21 +91,12 @@ public sealed class MyScript : MonoBehaviour
 
   private GameObject NextObstacle()
   {
-    Debug.Log(this._obstaclesEnumerator.HasValue);
+    var curr = this._obstacles[this._currentObstacleIndex];
+    this._currentObstacleIndex++;
 
-    this._obstaclesEnumerator ??= this._obstacles.GetEnumerator();
-
-    if (!this._obstaclesEnumerator.Value.MoveNext())
+    if (this._currentObstacleIndex == this._obstacles.Count - 1)
     {
-      this._obstaclesEnumerator = this._obstacles.GetEnumerator();
-      this._obstaclesEnumerator.Value.MoveNext();
-    }
-
-    var curr = this._obstaclesEnumerator.Value.Current;
-
-    if (curr is null)
-    {
-      throw new("BIG BAD!!!!!!!!!!");
+      this._currentObstacleIndex = 0;
     }
 
     return curr;
@@ -112,8 +104,9 @@ public sealed class MyScript : MonoBehaviour
 
   private void SetPos(Object o, float x, float y)
   {
-    var rb = this._rigidBodies[o.GetInstanceID()]!;
+    var rb = this.GetRigidBody(o);
     rb.MovePosition(new(x, y));
+    this.ResetRigidBody(o);
   }
 
   private void SetPos(
@@ -122,6 +115,15 @@ public sealed class MyScript : MonoBehaviour
   )
   {
     this.SetPos(o, coords.x, coords.y);
+  }
+
+  private void ResetRigidBody(Object o)
+  {
+    var rb = this.GetRigidBody(o);
+    rb.rotation        = 0;
+    rb.angularDrag     = 0;
+    rb.angularVelocity = 0;
+    rb.velocity        = this._noVelocity;
   }
 
   private ulong NextPeriod()
@@ -136,4 +138,6 @@ public sealed class MyScript : MonoBehaviour
 
     return ret;
   }
+
+  private Rigidbody2D GetRigidBody(Object o) => this._rigidBodies[o.GetInstanceID()]!;
 }
