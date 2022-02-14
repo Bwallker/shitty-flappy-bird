@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-using Random = System.Random;
-
 
 public sealed class MyScript : MonoBehaviour
 {
@@ -15,8 +13,6 @@ public sealed class MyScript : MonoBehaviour
 
   private readonly HashSet<GameObject> _obstacles;
 
-  private readonly Random _random;
-
   private readonly Dictionary<int, Rigidbody2D> _rigidBodies;
 
   private ulong _currentPeriod;
@@ -25,7 +21,6 @@ public sealed class MyScript : MonoBehaviour
 
   public MyScript()
   {
-    this._random      = new();
     this._obstacles   = new(MyScript.NumberOfObstacles);
     this._rigidBodies = new();
   }
@@ -64,30 +59,20 @@ public sealed class MyScript : MonoBehaviour
     }
 
     this._obstaclesEnumerator = this._obstacles.GetEnumerator();
-    Debug.Log("Logging enumerator contents");
-
-    while (this._obstaclesEnumerator.Value.MoveNext())
-    {
-      Debug.Log(this._obstaclesEnumerator.Value.Current);
-    }
-
-    this._obstaclesEnumerator = this._obstacles.GetEnumerator();
   }
-
-  private bool ComesFromBottom() => this._random.Next(0, 2) == 0;
 
   private void NextMove()
   {
     var obstacle = this.NextObstacle();
-    this.SetPos(obstacle, this.NextCoordinates());
+    this.SetPos(obstacle, MyScript.NextCoordinates());
   }
 
-  private Vector3 NextCoordinates()
+  private static Vector3 NextCoordinates()
   {
     const float xOffset = 6;
     const float yOffset = 3;
 
-    if (this.ComesFromBottom())
+    if (RandomGenerator.RandomBool())
     {
       return new(
                  15,
