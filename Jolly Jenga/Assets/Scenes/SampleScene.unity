@@ -370,7 +370,7 @@ GameObject:
   - component: {fileID: 1250504960}
   - component: {fileID: 1250504963}
   m_Layer: 0
-  m_Name: B1 Red Sheet_0 (1)
+  m_Name: Bird
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

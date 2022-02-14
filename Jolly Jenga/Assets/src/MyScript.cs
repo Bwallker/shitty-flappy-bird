@@ -1,5 +1,3 @@
-#nullable enable
-
 using src.util;
 
 using System.Collections.Generic;
@@ -23,7 +21,7 @@ public sealed class MyScript : MonoBehaviour
 
   private ulong _currentPeriod;
 
-  private HashSet<GameObject>.Enumerator _obstaclesEnumerator;
+  private HashSet<GameObject>.Enumerator? _obstaclesEnumerator;
 
   public MyScript()
   {
@@ -56,17 +54,24 @@ public sealed class MyScript : MonoBehaviour
       this._obstacles.Add(copy);
     }
 
-    this._obstaclesEnumerator = this._obstacles.GetEnumerator();
-    Debug.Log(this._obstacles);
-
     foreach (var obstacle in this._obstacles)
     {
-      this._rigidBodies[obstacle.GetInstanceID()] = obstacle.GetComponent<Rigidbody2D>();
+      this._rigidBodies[obstacle.GetInstanceID()] = obstacle.GetComponent<Rigidbody2D>()!;
       this.SetPos(obstacle, 100, 100);
       var rb = obstacle.GetComponent<Rigidbody2D>()!;
 
       rb.AddForce(new(-10, 0), ForceMode2D.Impulse);
     }
+
+    this._obstaclesEnumerator = this._obstacles.GetEnumerator();
+    Debug.Log("Logging enumerator contents");
+
+    while (this._obstaclesEnumerator.Value.MoveNext())
+    {
+      Debug.Log(this._obstaclesEnumerator.Value.Current);
+    }
+
+    this._obstaclesEnumerator = this._obstacles.GetEnumerator();
   }
 
   private bool ComesFromBottom() => this._random.Next(0, 2) == 0;
@@ -100,14 +105,22 @@ public sealed class MyScript : MonoBehaviour
 
   private GameObject NextObstacle()
   {
-    if (!this._obstaclesEnumerator.MoveNext())
+    Debug.Log(this._obstaclesEnumerator.HasValue);
 
+    this._obstaclesEnumerator ??= this._obstacles.GetEnumerator();
+
+    if (!this._obstaclesEnumerator.Value.MoveNext())
     {
       this._obstaclesEnumerator = this._obstacles.GetEnumerator();
-      this._obstaclesEnumerator.MoveNext();
+      this._obstaclesEnumerator.Value.MoveNext();
     }
 
-    var curr = this._obstaclesEnumerator.Current!;
+    var curr = this._obstaclesEnumerator.Value.Current;
+
+    if (curr is null)
+    {
+      throw new("BIG BAD!!!!!!!!!!");
+    }
 
     return curr;
   }
@@ -115,7 +128,6 @@ public sealed class MyScript : MonoBehaviour
   private void SetPos(Object o, float x, float y)
   {
     var rb = this._rigidBodies[o.GetInstanceID()]!;
-
     rb.MovePosition(new(x, y));
   }
 
