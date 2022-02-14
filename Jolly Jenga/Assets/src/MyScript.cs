@@ -1,27 +1,40 @@
 #nullable enable
-public sealed class MyScript : UnityEngine.MonoBehaviour
+
+using src.util;
+
+using System.Collections.Generic;
+
+using UnityEngine;
+
+using Random = System.Random;
+
+
+public sealed class MyScript : MonoBehaviour
 {
-  // Start is called before the first frame update
-
-  private readonly System.Collections.Generic.HashSet<UnityEngine.GameObject> _obstacles;
-
-  private readonly System.Collections.Generic.Dictionary<int, UnityEngine.Rigidbody2D> _rigidBodies;
-
-  private System.Collections.Generic.HashSet<UnityEngine.GameObject>.Enumerator _obstaclesEnumerator;
-
-  private readonly System.Random _random;
-
   private const int NumberOfObstacles = 50;
 
   private const ulong PeriodForObstacleSpawning = 10;
 
+  private readonly HashSet<GameObject> _obstacles;
+
+  private readonly Random _random;
+
+  private readonly Dictionary<int, Rigidbody2D> _rigidBodies;
+
   private ulong _currentPeriod;
+
+  private HashSet<GameObject>.Enumerator _obstaclesEnumerator;
 
   public MyScript()
   {
     this._random      = new();
     this._obstacles   = new(MyScript.NumberOfObstacles);
     this._rigidBodies = new();
+  }
+
+  public void Start()
+  {
+    this.InitObstacles();
   }
 
   public void FixedUpdate()
@@ -32,34 +45,27 @@ public sealed class MyScript : UnityEngine.MonoBehaviour
     }
   }
 
-  public void Start()
-  {
-    this.InitObstacles();
-  }
-
   private void InitObstacles()
   {
-    var parent = UnityEngine.GameObject.Find("Obstacle");
+    var parent = GameObject.Find("Obstacle");
     this._obstacles.Add(parent);
 
     for (var _ = 0; _ < MyScript.NumberOfObstacles - 1; ++_)
     {
-      var copy = UnityEngine.Object.Instantiate(parent);
+      var copy = Object.Instantiate(parent);
       this._obstacles.Add(copy);
     }
 
     this._obstaclesEnumerator = this._obstacles.GetEnumerator();
-  #if UNITY_EDITOR
-    UnityEngine.Debug.Log(this._obstacles);
-  #endif
+    Debug.Log(this._obstacles);
 
     foreach (var obstacle in this._obstacles)
     {
-      this._rigidBodies[obstacle.GetInstanceID()] = obstacle.GetComponent<UnityEngine.Rigidbody2D>();
+      this._rigidBodies[obstacle.GetInstanceID()] = obstacle.GetComponent<Rigidbody2D>();
       this.SetPos(obstacle, 100, 100);
-      var rb = obstacle.GetComponent<UnityEngine.Rigidbody2D>()!;
+      var rb = obstacle.GetComponent<Rigidbody2D>()!;
 
-      rb.AddForce(new(-10, 0), UnityEngine.ForceMode2D.Impulse);
+      rb.AddForce(new(-10, 0), ForceMode2D.Impulse);
     }
   }
 
@@ -71,7 +77,7 @@ public sealed class MyScript : UnityEngine.MonoBehaviour
     this.SetPos(obstacle, this.NextCoordinates());
   }
 
-  private UnityEngine.Vector3 NextCoordinates()
+  private Vector3 NextCoordinates()
   {
     const float xOffset = 6;
     const float yOffset = 3;
@@ -80,19 +86,19 @@ public sealed class MyScript : UnityEngine.MonoBehaviour
     {
       return new(
                  15,
-                 src.util.RandomGenerator.RandomFloat(-xOffset, -yOffset),
+                 RandomGenerator.RandomFloat(-xOffset, -yOffset),
                  0
                 );
     }
 
     return new(
                15,
-               src.util.RandomGenerator.RandomFloat(xOffset, yOffset),
+               RandomGenerator.RandomFloat(xOffset, yOffset),
                0
               );
   }
 
-  private UnityEngine.GameObject NextObstacle()
+  private GameObject NextObstacle()
   {
     if (!this._obstaclesEnumerator.MoveNext())
 
@@ -106,7 +112,7 @@ public sealed class MyScript : UnityEngine.MonoBehaviour
     return curr;
   }
 
-  private void SetPos(UnityEngine.Object o, float x, float y)
+  private void SetPos(Object o, float x, float y)
   {
     var rb = this._rigidBodies[o.GetInstanceID()]!;
 
@@ -114,8 +120,8 @@ public sealed class MyScript : UnityEngine.MonoBehaviour
   }
 
   private void SetPos(
-          UnityEngine.Object  o,
-          UnityEngine.Vector3 coords
+          Object  o,
+          Vector3 coords
   )
   {
     this.SetPos(o, coords.x, coords.y);
