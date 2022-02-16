@@ -15,11 +15,11 @@ public sealed class MyScript : MonoBehaviour
 
   private readonly Dictionary<int, Rigidbody2D> _rigidBodies;
 
+  private readonly Vector2 _zeroVector = new(0, 0);
+
   private int _currentObstacleIndex;
 
   private ulong _currentPeriod;
-
-  private readonly Vector2 _zeroVector = new(0, 0);
 
   public MyScript()
   {
@@ -53,7 +53,7 @@ public sealed class MyScript : MonoBehaviour
 
     foreach (var obstacle in this._obstacles)
     {
-      var rb = obstacle.GetComponent<Rigidbody2D>()!;
+      var rb = this.GetRigidBody(obstacle);
 
       this._rigidBodies[obstacle.GetInstanceID()] = rb;
       this.SetPos(obstacle, RandomGenerator.RandomFloat(100, 10000), 100);
@@ -64,9 +64,7 @@ public sealed class MyScript : MonoBehaviour
   {
     var obstacle = this.NextObstacle();
     this.SetPos(obstacle, MyScript.NextCoordinates());
-    var rb  = this.GetRigidBody(obstacle);
-    var pos = rb.position;
-    Debug.Log($"{obstacle.GetInstanceID()} moved to {pos.x}, {pos.y}");
+    var rb = this.GetRigidBody(obstacle);
     rb.AddForce(new(-100, 0), ForceMode2D.Impulse);
   }
 
@@ -74,7 +72,6 @@ public sealed class MyScript : MonoBehaviour
   {
     const float xOffset = 15;
     var         yOffset = RandomGenerator.RandomFloat(0, 5);
-    Debug.Log($"pos: {xOffset}, {yOffset}");
 
     if (RandomGenerator.RandomBool())
     {
@@ -110,7 +107,8 @@ public sealed class MyScript : MonoBehaviour
     var rb = this.GetRigidBody(o);
     rb.MovePosition(this._zeroVector);
     rb.position = new(x, y);
-    Debug.Assert(rb.position.x == x && rb.position.y == y);
+    var pos = rb.position;
+    Debug.Assert(pos.x == x && pos.y == y);
     this.ResetRigidBody(o);
   }
 
