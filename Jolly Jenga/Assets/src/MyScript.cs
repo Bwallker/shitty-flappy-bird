@@ -53,7 +53,7 @@ public sealed class MyScript : MonoBehaviour
 
     foreach (var obstacle in this._obstacles)
     {
-      var rb = this.GetRigidBody(obstacle);
+      var rb = obstacle.GetComponent<Rigidbody2D>()!;
 
       this._rigidBodies[obstacle.GetInstanceID()] = rb;
       this.SetPos(obstacle, RandomGenerator.RandomFloat(100, 10000), 100);
