@@ -53,8 +53,7 @@ public sealed class MyScript : MonoBehaviour
 
     foreach (var obstacle in this._obstacles)
     {
-      var rb = this.GetRigidBody(obstacle);
-
+      var rb = obstacle.GetComponent<Rigidbody2D>()!;
       this._rigidBodies[obstacle.GetInstanceID()] = rb;
       this.SetPos(obstacle, RandomGenerator.RandomFloat(100, 10000), 100);
     }
@@ -107,8 +106,6 @@ public sealed class MyScript : MonoBehaviour
     var rb = this.GetRigidBody(o);
     rb.MovePosition(this._zeroVector);
     rb.position = new(x, y);
-    var pos = rb.position;
-    Debug.Assert(pos.x == x && pos.y == y);
     this.ResetRigidBody(o);
   }
 
