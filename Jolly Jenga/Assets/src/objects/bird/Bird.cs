@@ -1,5 +1,7 @@
 ﻿#region
 
+using System.Linq;
+
 using UnityEngine;
 
 #endregion
@@ -44,23 +46,16 @@ namespace src.objects.bird
       }
 
       this._birdRb.position = pos;
-
       var closeObjects = Physics2D.OverlapCircleAll(pos, 5);
 
-      foreach (var obj in closeObjects)
+      foreach (var objPos in
+               from obj in closeObjects
+               where obj.name == "Obstacle"
+               select obj.GetComponent<Rigidbody2D>().position
+               into objPos
+               where Mathf.Approximately(objPos.y, this._birdRb.position.y)
+               select objPos)
       {
-        if (obj.name != "Obstacle")
-        {
-          continue;
-        }
-
-        var objPos = obj.GetComponent<Rigidbody2D>().position;
-
-        if (!Mathf.Approximately(objPos.y, this._birdRb.position.y))
-        {
-          continue;
-        }
-
         if (Mathf.Approximately(objPos.x, this._birdRb.position.x))
         {
           UI.UI.instance.GameOver();
