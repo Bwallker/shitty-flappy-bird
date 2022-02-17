@@ -7,9 +7,9 @@ using UnityEngine;
 
 public sealed class MyScript : MonoBehaviour
 {
-  private const int NumberOfObstacles = 100;
+  private const int NumberOfObstacles = 50;
 
-  private const ulong PeriodForObstacleSpawning = 10;
+  private const ulong PeriodForObstacleSpawning = 20;
 
   private readonly List<GameObject> _obstacles;
 
@@ -43,12 +43,16 @@ public sealed class MyScript : MonoBehaviour
   private void InitObstacles()
   {
     var parent = GameObject.Find("Obstacle");
-    this._obstacles.Add(parent);
 
-    for (var _ = 0; _ < MyScript.NumberOfObstacles - 1; ++_)
+    if (MyScript.NumberOfObstacles != 0)
     {
-      var copy = Object.Instantiate(parent);
-      this._obstacles.Add(copy);
+      this._obstacles.Add(parent);
+
+      for (var _ = 0; _ < MyScript.NumberOfObstacles - 1; ++_)
+      {
+        var copy = Object.Instantiate(parent);
+        this._obstacles.Add(copy);
+      }
     }
 
     foreach (var obstacle in this._obstacles)
@@ -62,6 +66,11 @@ public sealed class MyScript : MonoBehaviour
 
   private void NextMove()
   {
+    if (MyScript.NumberOfObstacles == 0)
+    {
+      return;
+    }
+
     var obstacle = this.NextObstacle();
     this.SetPos(obstacle, MyScript.NextCoordinates());
     var rb = this.GetRigidBody(obstacle);
@@ -107,8 +116,6 @@ public sealed class MyScript : MonoBehaviour
     var rb = this.GetRigidBody(o);
     rb.MovePosition(this._zeroVector);
     rb.position = new(x, y);
-    var pos = rb.position;
-    Debug.Assert(pos.x == x && pos.y == y);
     this.ResetRigidBody(o);
   }
 

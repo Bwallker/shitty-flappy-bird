@@ -12,7 +12,10 @@ namespace src.util
             ((float) RandomGenerator.Random.NextDouble() * (maxValue - minValue)) + minValue;
 
     /// Returns a random bool based on the probability it is true
-    /// <param name="probabilityOfBeingTrue">1.0 always returns true and 0.0 always returns false. 0.5 returns true half of the time.</param>
+    /// <param name="probabilityOfBeingTrue">
+    ///   1.0 always returns true and 0.0 always returns false. 0.5 returns true half of the
+    ///   time.
+    /// </param>
     internal static bool RandomBool(double probabilityOfBeingTrue) =>
             RandomGenerator.Random.NextDouble() < probabilityOfBeingTrue;
 
