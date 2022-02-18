@@ -1,7 +1,10 @@
+using src.util;
+
+using System.Collections;
+
 using TMPro;
 
 using UnityEngine;
-using UnityEngine.UI;
 
 
 namespace src.UI
@@ -12,21 +15,30 @@ namespace src.UI
 
     private int _scoreCount;
 
-    public static UI instance { get; private set; }
-
     // Start is called before the first frame update
+
+    public UI() => UI.Instance = this;
+
+    internal static UI? Instance { get; private set; }
+
     private void Start()
     {
       this._score = Object.FindObjectOfType<Canvas>().GetComponentInChildren<TextMeshProUGUI>();
     }
 
-    public void GameOver()
+    internal void GameOver()
     {
-      this._score!.text = $"Game over! you scored: {this._scoreCount}";
-      Application.Quit();
+      this._score!.text = $"Game over! you scored: {this._scoreCount}\r\nPress enter or tap on the screen to exit";
+      var allObjects = Object.FindObjectsOfType<GameObject>();
+
+      foreach (var obj in allObjects)
+      {
+        var cond = obj.name is "GameOverHandler" or "Main Camera" or "Canvas";
+        GameObjectUtil.ToggleGameObjectEnabled(obj, cond);
+      }
     }
 
-    public void Score()
+    internal void Score()
     {
       this._score!.text = this._scoreCount++.ToString();
     }

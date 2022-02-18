@@ -1,6 +1,5 @@
-﻿#region
-
-using System.Linq;
+﻿
+#region
 
 using UnityEngine;
 
@@ -11,16 +10,13 @@ namespace src.objects.bird
 {
   public sealed class Bird : MonoBehaviour
   {
-    private GameObject? _bird;
-
     private const float StrengthOfJump = 250;
 
     private Rigidbody2D? _birdRb;
 
     public void Start()
     {
-      this._bird   = GameObject.Find("Bird");
-      this._birdRb = this._bird.GetComponent<Rigidbody2D>();
+      this._birdRb = this.gameObject.GetComponent<Rigidbody2D>();
     }
 
     public void Update()
@@ -46,23 +42,16 @@ namespace src.objects.bird
       }
 
       this._birdRb.position = pos;
-      var closeObjects = Physics2D.OverlapCircleAll(pos, 5);
+    }
 
-      foreach (var objPos in
-               from obj in closeObjects
-               where obj.name == "Obstacle"
-               select obj.GetComponent<Rigidbody2D>().position
-               into objPos
-               where Mathf.Approximately(objPos.y, this._birdRb.position.y)
-               select objPos)
+    public void OnCollisionEnter2D(Collision2D col)
+    {
+      if (col.gameObject.name != "Obstacle")
       {
-        if (Mathf.Approximately(objPos.x, this._birdRb.position.x))
-        {
-          UI.UI.instance.GameOver();
-        }
-
-        UI.UI.instance.Score();
+        return;
       }
+
+      UI.UI.Instance!.GameOver();
     }
 
     private static (Vector2, Coords ) LimitVector(Vector2 vec, float limit, Coords coordinate)
