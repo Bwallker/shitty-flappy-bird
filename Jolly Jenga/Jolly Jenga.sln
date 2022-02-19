@@ -131,8 +131,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnityEngine.UI.Tests", "Uni
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.2D.Animation.EditorTests", "Unity.2D.Animation.EditorTests.Player.csproj", "{ed1edc75-715a-06ea-ca29-6f06d706a951}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.Nuget.NewtonsoftJson.EditorTests", "Unity.Nuget.NewtonsoftJson.EditorTests.Player.csproj", "{ab539795-879d-9c31-94da-56800ce8a65a}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.TextMeshPro.Tests", "Unity.TextMeshPro.Tests.Player.csproj", "{c77e60dd-59f2-d261-a96e-64f629aa6ba2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeparateAssembly", "SeparateAssembly.Player.csproj", "{2d0ffc24-00da-b86e-d1df-120668525455}"
@@ -276,8 +274,6 @@ Global
 		{cfd4ae9b-d16f-e053-71a8-a9f4de8ce468}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ed1edc75-715a-06ea-ca29-6f06d706a951}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{ed1edc75-715a-06ea-ca29-6f06d706a951}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ab539795-879d-9c31-94da-56800ce8a65a}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ab539795-879d-9c31-94da-56800ce8a65a}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{c77e60dd-59f2-d261-a96e-64f629aa6ba2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{c77e60dd-59f2-d261-a96e-64f629aa6ba2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2d0ffc24-00da-b86e-d1df-120668525455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU

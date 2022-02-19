@@ -1,6 +1,5 @@
+using src.components;
 using src.util;
-
-using System.Collections;
 
 using TMPro;
 
@@ -33,7 +32,7 @@ namespace src.UI
 
       foreach (var obj in allObjects)
       {
-        var cond = obj.name is "GameOverHandler" or "Main Camera" or "Canvas";
+        var cond = Tags.HasTag(obj, "GameOverPersistent");
         GameObjectUtil.ToggleGameObjectEnabled(obj, cond);
       }
     }

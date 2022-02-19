@@ -1,5 +1,4 @@
-﻿
-#region
+﻿#region
 
 using UnityEngine;
 
@@ -42,16 +41,6 @@ namespace src.objects.bird
       }
 
       this._birdRb.position = pos;
-    }
-
-    public void OnCollisionEnter2D(Collision2D col)
-    {
-      if (col.gameObject.name != "Obstacle")
-      {
-        return;
-      }
-
-      UI.UI.Instance!.GameOver();
     }
 
     private static (Vector2, Coords ) LimitVector(Vector2 vec, float limit, Coords coordinate)

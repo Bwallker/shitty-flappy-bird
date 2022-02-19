@@ -9,19 +9,26 @@ namespace src
 {
   public sealed class Obstacles : MonoBehaviour
   {
-    internal const int NumberOfObstacles = 50;
+    private const int NumberOfObstacles = 50;
 
     private const ulong PeriodForObstacleSpawning = 20;
+
+    private const float InitialSizeOfOpening = 3;
+
+    private const float ShrinkPerTick = 0.001f;
+
+    private const float SmallestOpeningSize = 2;
 
     private readonly List<GameObject> _obstacles;
 
     private readonly Dictionary<int, Rigidbody2D> _rigidBodies;
 
-    private readonly Vector2 _zeroVector = new(0, 0);
-
     private int _currentObstacleIndex;
 
     private ulong _currentPeriod;
+
+    [SerializeField]
+    public PhysicsMaterial2D? material;
 
     public Obstacles()
     {
@@ -54,8 +61,48 @@ namespace src
 
     private void InitObstacles()
     {
-      var parent = GameObject.Find("Obstacle");
+      var parent            = GameObject.Find("Obstacle");
+      var transformOfParent = parent.GetComponent<Transform>();
 
+      var bottom = transformOfParent.Find("Bottom Part").gameObject;
+      var top    = Object.Instantiate(bottom, transformOfParent, true);
+      top.name = "Top Part";
+      top.tag  = "Top Part";
+
+      var parentRb = parent.AddComponent<Rigidbody2D>();
+      parentRb.drag            = 0;
+      parentRb.inertia         = 0;
+      parentRb.useAutoMass     = true;
+      parentRb.angularDrag     = 0;
+      parentRb.velocity        = VectorUtil.ZeroVector;
+      parentRb.angularVelocity = 0;
+      parentRb.gravityScale    = 0;
+      parentRb.sharedMaterial  = this.material;
+      parentRb.constraints     = RigidbodyConstraints2D.FreezeRotation;
+
+      var bottomBc = bottom.GetComponent<BoxCollider2D>()!;
+
+      var bc = parent.AddComponent<BoxCollider2D>();
+
+      bc.size = new(bottomBc.size.x, Obstacles.InitialSizeOfOpening);
+
+      var offset = bc.offset;
+      offset.x = 0;
+      var localScale = bottom.transform.localScale;
+      offset.y  = (Obstacles.InitialSizeOfOpening * 0.5f) + (localScale.y * 0.5f);
+      bc.offset = offset;
+
+      bc.isTrigger = true;
+
+      var oldPos = bottom.transform.position;
+
+      var newPos = new Vector3(
+                               oldPos.x,
+                               oldPos.y + Obstacles.InitialSizeOfOpening + localScale.y,
+                               oldPos.z
+                              );
+
+      top.transform.position = newPos;
       this._obstacles.Add(parent);
 
       for (var _ = 0; _ < Obstacles.NumberOfObstacles - 1; ++_)
@@ -78,7 +125,7 @@ namespace src
       var obstacle = this.NextObstacle();
       this.SetPos(obstacle, Obstacles.NextCoordinates());
       var rb = this.GetRigidBody(obstacle);
-      rb.AddForce(new(-100, 0), ForceMode2D.Impulse);
+      rb.AddForce(new(-5, 0), ForceMode2D.Impulse);
     }
 
     private static Vector3 NextCoordinates()
@@ -118,7 +165,6 @@ namespace src
     private void SetPos(Object o, float x, float y)
     {
       var rb = this.GetRigidBody(o);
-      rb.MovePosition(this._zeroVector);
       rb.position = new(x, y);
       this.ResetRigidBody(o);
     }
@@ -137,7 +183,7 @@ namespace src
       rb.rotation        = 0;
       rb.angularDrag     = 0;
       rb.angularVelocity = 0;
-      rb.velocity        = this._zeroVector;
+      rb.velocity        = VectorUtil.ZeroVector;
     }
 
     private ulong NextPeriod()

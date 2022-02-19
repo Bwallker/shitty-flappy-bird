@@ -20,7 +20,6 @@ namespace src
         return;
       }
 
-      Debug.Log("Made it here!");
       Application.Quit();
     }
   }
