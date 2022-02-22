@@ -21,7 +21,7 @@ namespace src.objects.bird
     public void Update()
     {
       if (!Input.GetKeyDown(KeyCode.Space) &&
-          Input.touches.Length == 0)
+          Input.touches!.Length == 0)
       {
         return;
       }
