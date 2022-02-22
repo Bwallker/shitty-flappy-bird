@@ -1,8 +1,9 @@
-using src.util;
-
 using System.Collections.Generic;
 
+using src.util;
+
 using UnityEngine;
+using UnityEngine.Assertions;
 
 
 namespace src
@@ -11,13 +12,16 @@ namespace src
   {
     private const int NumberOfObstacles = 50;
 
-    private const ulong PeriodForObstacleSpawning = 20;
+    private const int PeriodForObstacleSpawning = 20;
 
     private const float InitialSizeOfOpening = 3;
 
     private const float ShrinkPerTick = 0.001f;
 
     private const float SmallestOpeningSize = 2;
+
+    [SerializeField]
+    public PhysicsMaterial2D? material;
 
     private readonly List<GameObject> _obstacles;
 
@@ -26,9 +30,6 @@ namespace src
     private int _currentObstacleIndex;
 
     private ulong _currentPeriod;
-
-    [SerializeField]
-    public PhysicsMaterial2D? material;
 
     public Obstacles()
     {
@@ -62,14 +63,15 @@ namespace src
     private void InitObstacles()
     {
       var parent            = GameObject.Find("Obstacle");
-      var transformOfParent = parent.GetComponent<Transform>();
+      var transformOfParent = parent!.GetComponent<Transform>();
+      Assert.IsNotNull(transformOfParent);
 
-      var bottom = transformOfParent.Find("Bottom Part").gameObject;
+      var bottom = transformOfParent!.Find("Bottom Part")!.gameObject;
       var top    = Object.Instantiate(bottom, transformOfParent, true);
-      top.name = "Top Part";
+      top!.name = "Top Part";
 
       var parentRb = parent.AddComponent<Rigidbody2D>();
-      parentRb.drag            = 0;
+      parentRb!.drag           = 0;
       parentRb.inertia         = 0;
       parentRb.useAutoMass     = true;
       parentRb.angularDrag     = 0;
@@ -84,7 +86,7 @@ namespace src
 
       var bc = parent.AddComponent<BoxCollider2D>();
 
-      bc.size = new(bottomBc.size.x, Obstacles.InitialSizeOfOpening);
+      bc!.size = new(bottomBc.size.x, Obstacles.InitialSizeOfOpening);
 
       var offset = bc.offset;
       offset.x  = 0;
