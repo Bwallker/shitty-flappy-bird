@@ -1,4 +1,6 @@
-﻿using components;
+﻿using System;
+
+using components;
 
 using UnityEngine;
 
@@ -7,9 +9,9 @@ namespace src
 {
   public sealed class ObstaclePart : MonoBehaviour
   {
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-      var obj = other.gameObject;
+      var obj = collision.gameObject!;
 
       if (!Tags.HasTag(obj, "Bird"))
       {

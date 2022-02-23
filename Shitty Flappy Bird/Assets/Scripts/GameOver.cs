@@ -1,6 +1,7 @@
 ﻿using src.util;
 
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 namespace src
@@ -15,12 +16,12 @@ namespace src
     public void Update()
     {
       if (!Input.GetKey(KeyCode.Space) &&
-          Input.touches.Length == 0)
+          Input.touches!.Length == 0)
       {
         return;
       }
 
-      Application.Quit();
+      SceneManager.LoadScene("MainMenuScene");
     }
   }
 }

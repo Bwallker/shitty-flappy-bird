@@ -19,19 +19,24 @@ namespace src.UI
 
     public UI() => UI.Instance = this;
 
-    internal static UI? Instance { get; private set; }
+    internal static UI? Instance
+    {
+      get;
+
+      private set;
+    }
 
     private void Start()
     {
-      this._score = Object.FindObjectOfType<Canvas>().GetComponentInChildren<TextMeshProUGUI>();
+      this._score = Object.FindObjectOfType<Canvas>()!.GetComponentInChildren<TextMeshProUGUI>();
     }
 
     internal void GameOver()
     {
-      this._score!.text = $"Game over! you scored: {this._scoreCount}\r\nPress enter or tap on the screen to exit";
+      this._score!.text = $"Game over! you scored: {this._scoreCount}\r\nPress space or tap on the screen to exit";
       var allObjects = Object.FindObjectsOfType<GameObject>();
 
-      foreach (var obj in allObjects)
+      foreach (var obj in allObjects!)
       {
         var cond = Tags.HasTag(obj, "GameOverPersistent");
         GameObjectUtil.ToggleGameObjectEnabled(obj, cond);

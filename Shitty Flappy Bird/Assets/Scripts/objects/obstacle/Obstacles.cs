@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using src.util;
 
 using UnityEngine;
-using UnityEngine.Assertions;
 
 
 namespace src
@@ -14,11 +13,9 @@ namespace src
 
     private const int PeriodForObstacleSpawning = 20;
 
-    private const float InitialSizeOfOpening = 3;
+    private const float SizeOfOpening = 5;
 
-    private const float ShrinkPerTick = 0.001f;
-
-    private const float SmallestOpeningSize = 2;
+    private const float InitialObstacleSpeed = 100;
 
     [SerializeField]
     public PhysicsMaterial2D? material;
@@ -30,6 +27,10 @@ namespace src
     private int _currentObstacleIndex;
 
     private ulong _currentPeriod;
+
+    private float _lastVariation;
+
+    private float _trueMiddleOfObstacle;
 
     public Obstacles()
     {
@@ -64,7 +65,6 @@ namespace src
     {
       var parent            = GameObject.Find("Obstacle");
       var transformOfParent = parent!.GetComponent<Transform>();
-      Assert.IsNotNull(transformOfParent);
 
       var bottom = transformOfParent!.Find("Bottom Part")!.gameObject;
       var top    = Object.Instantiate(bottom, transformOfParent, true);
@@ -84,20 +84,22 @@ namespace src
       var bottomBc   = bottom.GetComponent<BoxCollider2D>()!;
       var localScale = bottom.transform.localScale;
 
-      var bc = parent.AddComponent<BoxCollider2D>();
+      var bc = parent.AddComponent<BoxCollider2D>()!;
 
-      bc!.size = new(bottomBc.size.x, Obstacles.InitialSizeOfOpening);
+      bc.size = new(bottomBc.size.x, Obstacles.SizeOfOpening);
 
       var offset = bc.offset;
-      offset.x  = 0;
-      offset.y  = (Obstacles.InitialSizeOfOpening * 0.5f) + (localScale.y * 0.5f);
-      bc.offset = offset;
+      offset.x     = 0;
+      offset.y     = (Obstacles.SizeOfOpening * 0.5f) + (localScale.y * 0.5f);
+      bc.offset    = offset;
+      bc.isTrigger = true;
 
+      this._trueMiddleOfObstacle = -offset.y;
       var oldPos = bottom.transform.position;
 
       var newPos = new Vector3(
                                oldPos.x,
-                               oldPos.y + Obstacles.InitialSizeOfOpening + localScale.y,
+                               oldPos.y + Obstacles.SizeOfOpening + localScale.y,
                                oldPos.z
                               );
 
@@ -122,35 +124,37 @@ namespace src
     private void NextMove()
     {
       var obstacle = this.NextObstacle();
-      this.SetPos(obstacle, Obstacles.NextCoordinates());
+      this.SetPos(obstacle, this.NextCoordinates());
       var rb = this.GetRigidBody(obstacle);
-      rb.AddForce(new(-5, 0), ForceMode2D.Impulse);
+      rb.AddForce(new(-Obstacles.InitialObstacleSpeed, 0), ForceMode2D.Impulse);
     }
 
-    private static Vector3 NextCoordinates()
+    private Vector3 NextCoordinates()
     {
-      const float xOffset = 15;
-      var         yOffset = RandomGenerator.RandomFloat(0, 5);
+      const float xOffset            = 15;
+      const float yVariation         = 3;
+      const float variationTolerance = 2;
+      float       yOffset;
 
-      if (RandomGenerator.RandomBool())
+      do
       {
-        return new(
-                   xOffset,
-                   yOffset,
-                   0
-                  );
-      }
+        yOffset = RandomGenerator.RandomFloat(-yVariation, yVariation);
+      } while (Mathf.Abs(yOffset - this._lastVariation) > variationTolerance);
+
+      this._lastVariation = yOffset;
+
+      yOffset += this._trueMiddleOfObstacle;
 
       return new(
                  xOffset,
-                 -yOffset,
+                 yOffset,
                  0
                 );
     }
 
     private GameObject NextObstacle()
     {
-      var curr = this._obstacles[this._currentObstacleIndex];
+      var curr = this._obstacles[this._currentObstacleIndex]!;
 
       this._currentObstacleIndex = (this._currentObstacleIndex + 1) % this._obstacles.Count;
 
